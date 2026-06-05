@@ -6,6 +6,11 @@ on:
       - "v*"
 
   workflow_dispatch:
+    inputs:
+      base_image_url:
+        description: "Raspberry Pi OS Lite image URL"
+        required: false
+        type: string
 
 jobs:
   build:
@@ -13,6 +18,9 @@ jobs:
 
     permissions:
       contents: write
+
+    env:
+      DEFAULT_BASE_IMAGE_URL: https://downloads.raspberrypi.com/raspios_lite_armhf/images/raspios_lite_armhf-2026-04-21/2026-04-21-raspios-trixie-armhf-lite.img.xz
 
     steps:
       - name: Checkout repo
@@ -30,11 +38,16 @@ jobs:
             binfmt-support
 
       - name: Download Raspberry Pi OS Lite 32-bit
+        env:
+          BASE_IMAGE_URL: ${{ github.event.inputs.base_image_url || vars.BASE_IMAGE_URL || env.DEFAULT_BASE_IMAGE_URL }}
         run: |
           mkdir -p base
           cd base
 
-          curl -L -o raspios.img.xz https://downloads.raspberrypi.com/raspios_lite_armhf/images/raspios_lite_armhf-2026-04-21/2026-04-21-raspios-trixie-armhf-lite.img.xz
+          echo "Downloading base image from ${BASE_IMAGE_URL}"
+          curl --fail --location --retry 3 --retry-delay 5 \
+            --output raspios.img.xz \
+            "${BASE_IMAGE_URL}"
 
       - name: Clone Waveshare driver
         run: |
