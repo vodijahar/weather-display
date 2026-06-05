@@ -1,0 +1,14 @@
+[Unit]
+Description=Weather Display First Boot Setup
+After=NetworkManager.service
+Wants=NetworkManager.service
+ConditionPathExists=!/var/lib/weather-display/.firstboot_done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/firstboot-weather.sh
+RemainAfterExit=yes
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

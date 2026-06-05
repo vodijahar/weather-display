@@ -1,0 +1,14 @@
+[Unit]
+Description=Weather E-Ink Display Update
+After=network-online.target location-lookup.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/weather-display/app
+EnvironmentFile=-/etc/default/weather-display
+ExecStart=/usr/bin/python3 /opt/weather-display/app/update_display.py
+NoNewPrivileges=yes
+PrivateTmp=yes
+UMask=0077
